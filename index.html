@@ -1,1 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flappy Bird</title>
+  <style>
+    * { margin: 0; padding: 0; }
+    canvas { background: #70c5ce; display: block; margin: 0 auto; }
+  </style>
+</head>
+<body>
+<canvas id="gameCanvas" width="320" height="480"></canvas>
+<script>
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+
+  let birdY = 150;
+  let birdV = 0;
+  const gravity = 0.6;
+  const jump = -10;
+  let pipes = [{ x: 400, y: Math.random() * 200 + 50 }];
+  let score = 0;
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw bird
+    ctx.fillStyle = 'yellow';
+    ctx.beginPath();
+    ctx.arc(80, birdY, 15, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Move bird
+    birdV += gravity;
+    birdY += birdV;
+
+    // Draw pipes
+    ctx.fillStyle = 'green';
+    pipes.forEach(pipe => {
+      pipe.x -= 2;
+      ctx.fillRect(pipe.x, 0, 50, pipe.y);
+      ctx.fillRect(pipe.x, pipe.y + 100, 50, 480);
+    });
+
+    // Add new pipes
+    if (pipes[pipes.length - 1].x < 200) {
+      pipes.push({ x: 400, y: Math.random() * 200 + 50 });
+    }
+
+    // Remove old pipes
+    if (pipes[0].x < -50) {
+      pipes.shift();
+      score++;
+    }
+
+    // Check collision
+    pipes.forEach(pipe => {
+      if (80 > pipe.x && 80 < pipe.x + 50) {
+        if (birdY < pipe.y || birdY > pipe.y + 100) {
+          alert('Game Over! Score: ' + score);
+          location.reload();
+        }
+      }
+    });
+
+    // Check out of bounds
+    if (birdY > 480 || birdY < 0) {
+      alert('Game Over! Score: ' + score);
+      location.reload();
+    }
+
+    // Draw score
+    ctx.fillStyle = 'black';
+    ctx.font = '20px sans-serif';
+    ctx.fillText('Score: ' + score, 10, 25);
+
+    requestAnimationFrame(draw);
+  }
+
+  canvas.addEventListener('touchstart', () => {
+    birdV = jump;
+  });
+
+  draw();
+</script>
+</body>
+</html>
 
